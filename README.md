@@ -19,14 +19,15 @@ Apply NLP techniques to real-world datasets.
 Build and evaluate a machine learning classification model.
 Understand text preprocessing and feature extraction.
 Provide a simple interface for predicting custom news articles.
-🛠 Technologies Used
-Technology	Purpose
-Python	Programming Language
-Pandas	Data Processing
-Scikit-learn	Machine Learning
-TF-IDF Vectorizer	Text Feature Extraction
-Logistic Regression	Classification Algorithm
-NumPy	Numerical Operations
+
+🛠 Technologies Used:
+Technology                         	Purpose
+Python	                        Programming Language
+Pandas                          	Data Processing
+Scikit-learn                    	Machine Learning
+TF-IDF Vectorizer	             Text Feature Extraction
+Logistic Regression          	Classification Algorithm
+NumPy                          	Numerical Operations
 
  Dataset:
 The project uses the Fake and Real News Dataset containing thousands of news articles.
