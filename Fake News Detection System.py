@@ -1,54 +1,88 @@
-#Fake News Detection System
+# Fake News Detection System using Kaggle Dataset (Direct URL)
 
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-#dataset
-data = {
-    "news": [
-        "Government launches new education policy",
-        "Aliens landed in New York yesterday",
-        "Stock market reaches all time high",
-        "Fake miracle cure discovered online"
-    ],
-    "label": [1, 0, 1, 0]  # 1 = Real, 0 = Fake
-}
+# Load Dataset from Direct URLs
+fake_url = "https://raw.githubusercontent.com/laxmimerit/Fake-Real-News-Dataset/main/data/Fake.csv"
+true_url = "https://raw.githubusercontent.com/laxmimerit/Fake-Real-News-Dataset/main/data/True.csv"
 
-df = pd.DataFrame(data)
+print("Loading dataset...")
 
-# Features and labels
-x = df["news"]
+fake_df = pd.read_csv(fake_url)
+true_df = pd.read_csv(true_url)
+
+# Add labels
+fake_df["label"] = 0  # Fake News
+true_df["label"] = 1  # Real News
+
+# Merge datasets
+df = pd.concat([fake_df, true_df], ignore_index=True)
+
+# Keep only required columns
+df = df[["text", "label"]]
+
+print("Dataset Loaded Successfully!")
+print("Total Records:", len(df))
+
+# Features and Labels
+X = df["text"]
 y = df["label"]
 
-# Convert text into numerical data
-vectorizer = TfidfVectorizer()
-x = vectorizer.fit_transform(x)
-
-# Split dataset
-x_train, x_test, y_train, y_test = train_test_split(
-    x, y, test_size=0.2, random_state=42
+# Convert text to numerical features
+vectorizer = TfidfVectorizer(
+    stop_words="english",
+    max_df=0.7
 )
 
-# Train model
-model = LogisticRegression()
-model.fit(x_train, y_train)
+X = vectorizer.fit_transform(X)
 
-# Prediction
-prediction = model.predict(x_test)
+# Split Dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
 
-# Accuracy
-print("Accuracy:", accuracy_score(y_test, prediction))
+# Train Model
+print("\nTraining Model...")
 
-# Test custom news
-sample_news = ["Breaking news: Scientists discover water on Mars"]
-sample_vector = vectorizer.transform(sample_news)
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
 
-result = model.predict(sample_vector)
+print("Training Complete!")
 
-if result[0] == 1:
-    print("Real News")
-else:
-    print("Fake News")
+# Evaluate Model
+predictions = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, predictions)
+
+print("\nModel Accuracy:", round(accuracy * 100, 2), "%")
+
+print("\nClassification Report:")
+print(classification_report(y_test, predictions))
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, predictions))
+
+# Custom News Prediction
+while True:
+    print("\nEnter a news headline/article:")
+    news = input(">> ")
+
+    if news.lower() == "exit":
+        break
+
+    news_vector = vectorizer.transform([news])
+
+    result = model.predict(news_vector)
+
+    if result[0] == 1:
+        print(" Real News")
+    else:
+        print(" Fake News")
